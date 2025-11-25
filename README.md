@@ -241,19 +241,4 @@ View training metrics and experiments:
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
 
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
-
-## 📧 Contact
-
-For questions or issues, please open an issue on GitHub.
-
----
-
-**Made with ❤️ for edge AI deployment**
