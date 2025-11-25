@@ -1,95 +1,102 @@
-# Bottle Cap Detection with YOLOv8
+# Bottle Cap Detection 🎯
 
-[![CI/CD](https://github.com/yourusername/bottle-cap-detection/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/bottle-cap-detection/actions)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![CI/CD Pipeline](https://github.com/YOUR_USERNAME/bottle-cap-detection/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/bottle-cap-detection/actions)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Deep learning-based bottle cap color detection system optimized for edge devices (Raspberry Pi 5 target). Detects three classes: dark blue, light blue, and mixed/others bottle caps.
+Deep learning-based bottle cap color detection system optimized for edge devices (Raspberry Pi 5 target: ≤10ms inference).
 
-## 🎯 Project Overview
+## 📋 Project Summary
 
-This project implements an automated bottle cap detection system using YOLOv8 Nano, achieving:
-- **Inference Speed**: ~7-10ms per image (target: ≤10ms for edge devices)
-- **Model Size**: <9MB (YOLOv8n)
-- **Accuracy**: 99.3% mAP@50, 78.8% mAP@50-95
+This project implements a YOLOv8 Nano-based object detection model to classify bottle caps into three categories:
+- **Dark Blue** 🔵
+- **Light Blue** 🟦
+- **Others** ⚪
 
 ### Key Features
-- Transfer learning from COCO-pretrained YOLOv8n
-- Heavy data augmentation for small dataset (148 images)
-- Multiple export formats (PyTorch, ONNX, TorchScript)
-- CLI tool for training and inference
-- Experiment tracking with Weights & Biases
-- Docker deployment ready
-- Complete CI/CD pipeline
-
-## 📊 Results
+- ✅ Optimized for small datasets (100-150 samples) with heavy augmentation
+- ✅ Edge-device ready (320x320 input, <10ms inference target)
+- ✅ ONNX export for faster inference
+- ✅ CLI tool for training and inference
+- ✅ Docker containerized deployment
+- ✅ CI/CD with automated testing and linting
+- ✅ Weights & Biases integration for experiment tracking
 
 ### Model Performance
 | Metric | Value |
 |--------|-------|
 | mAP@50 | 99.3% |
 | mAP@50-95 | 78.8% |
-| Avg Inference Time (CPU) | 74ms |
-| Avg Inference Time (ONNX) | ~10ms |
-| Model Parameters | 3.01M |
-
-### Per-Class Metrics
-| Class | Precision | Recall | mAP@50 |
-|-------|-----------|--------|--------|
-| Dark Blue | 0.968 | 0.974 | 0.993 |
-| Light Blue | 0.966 | 0.974 | 0.993 |
-| Others | 0.960 | 0.974 | 0.994 |
-
-🔗 **[View Training Logs on W&B](https://wandb.ai/your-project/bottle-cap-detection)**
+| Inference Time (PyTorch) | ~70ms (CPU) |
+| Inference Time (ONNX) | ~8-15ms (optimized) |
+| Model Size | <9 MB |
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.10+
-- CUDA (optional, for GPU training)
-- Docker (optional, for containerized deployment)
-
 ### Installation
 
+#### Using pip
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/bottle-cap-detection.git
+git clone https://github.com/YOUR_USERNAME/bottle-cap-detection.git
 cd bottle-cap-detection
 
-# Install with pip
+# Install dependencies
 pip install -e .
-
-# Or install with poetry
-poetry install
 ```
 
-### Basic Usage
+#### Using Docker
+```bash
+# Build image
+docker build -t bottle-cap-detection .
+
+# Run container
+docker run -it --rm bottle-cap-detection bsort --help
+```
+
+## 📦 Usage
+
+### CLI Tool: `bsort`
 
 #### Training
 ```bash
-# Train with default config
+# Basic training
 bsort train --config configs/train_config.yaml
 
-# Train with custom parameters
-bsort train --config configs/train_config.yaml --epochs 300 --batch-size 32
+# Custom parameters
+bsort train --config configs/train_config.yaml --epochs 300 --batch-size 16
 ```
 
-#### Inference
+#### Inference (PyTorch)
 ```bash
-# Single image inference (PyTorch)
-bsort predict --model weights/best.pt --source image.jpg --output results/
+# Single image
+bsort infer --image path/to/image.jpg --model runs/best.pt
 
-# ONNX inference (faster)
-bsort predict --model weights/best.onnx --source image.jpg --engine onnx
-
-# Batch inference
-bsort predict --model weights/best.pt --source images/ --batch
+# With visualization
+bsort infer --image sample.jpg --model best.pt --output result.jpg --visualize
 ```
 
-#### Benchmarking
+#### Inference (ONNX - Fast)
 ```bash
-# Benchmark inference speed
-bsort benchmark --model weights/best.pt --source test.jpg --runs 100
+# ONNX inference
+bsort infer-onnx --image sample.jpg --model model.onnx --output result.jpg
+
+# With benchmark
+bsort infer-onnx --image sample.jpg --model model.onnx --benchmark --runs 100
+```
+
+### Python API
+```python
+from bsort.detector import BottleCapDetector
+
+# Initialize detector
+detector = BottleCapDetector(model_path="best.pt", imgsz=320, conf=0.5)
+
+# Run detection
+result = detector.detect("image.jpg", visualize=True)
+
+print(f"Found {len(result['detections'])} caps")
+print(f"Inference time: {result['inference_time_ms']:.2f}ms")
 ```
 
 ## 📁 Project Structure
@@ -98,156 +105,155 @@ bsort benchmark --model weights/best.pt --source test.jpg --runs 100
 bottle-cap-detection/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                 # CI/CD pipeline
-├── bsort/
+│       └── ci.yml              # CI/CD pipeline
+├── bsort/                      # Main package
 │   ├── __init__.py
-│   ├── cli.py                     # CLI entrypoint
-│   ├── train.py                   # Training logic
-│   ├── inference.py               # PyTorch inference
-│   ├── inference_onnx.py          # ONNX inference
-│   ├── config.py                  # Config management
-│   └── utils.py                   # Utility functions
+│   ├── cli.py                  # CLI entry point
+│   ├── train.py                # Training script
+│   ├── detector.py             # PyTorch detector
+│   ├── detector_onnx.py        # ONNX detector
+│   └── utils.py                # Utility functions
 ├── configs/
-│   ├── train_config.yaml          # Training configuration
-│   └── inference_config.yaml      # Inference configuration
+│   └── train_config.yaml       # Training configuration
 ├── tests/
-│   ├── __init__.py
-│   ├── test_train.py
-│   ├── test_inference.py
-│   └── conftest.py
+│   ├── test_detector.py
+│   └── test_train.py
 ├── notebooks/
-│   └── Bottle_Cap_Detection.ipynb # Original notebook
-├── weights/                       # Model weights
-├── data/                          # Dataset directory
-├── Dockerfile                     # Docker configuration
-├── pyproject.toml                 # Project dependencies
-├── README.md                      # This file
-├── .pylintrc                      # Pylint config
+│   └── Bottle_Cap_Detection.ipynb
+├── Dockerfile
+├── pyproject.toml
+├── requirements.txt
+├── README.md
 └── .gitignore
 ```
 
 ## ⚙️ Configuration
 
-### Training Config (`configs/train_config.yaml`)
+Edit `configs/train_config.yaml`:
+
 ```yaml
-model:
-  name: yolov8n.pt
-  pretrained: true
+# Model settings
+model: yolov8n.pt
+epochs: 250
+imgsz: 320
+batch_size: 16
+patience: 50
 
-data:
-  path: dataset_mix/data.yaml
-  train: train/images
-  val: valid/images
-  test: test/images
-  nc: 3
-  names: ['dark_blue', 'light_blue', 'others']
+# Dataset
+data_yaml: dataset/data.yaml
 
-training:
-  epochs: 250
-  batch_size: 16
-  imgsz: 320
-  patience: 50
-  lr0: 0.0001
-  
-# See full config in configs/train_config.yaml
+# Augmentation
+hsv_h: 0.015
+hsv_s: 0.7
+degrees: 15.0
+mosaic: 0.5
+mixup: 0.1
+
+# Optimization
+lr0: 0.0001
+optimizer: Adam
 ```
 
-## 🐳 Docker Deployment
+## 🧪 Development
 
-### Build Image
-```bash
-docker build -t bottle-cap-detection:latest .
-```
-
-### Run Container
-```bash
-# CPU inference
-docker run -v $(pwd)/images:/app/images \
-           bottle-cap-detection:latest \
-           predict --model weights/best.onnx --source /app/images/test.jpg
-
-# GPU inference
-docker run --gpus all \
-           -v $(pwd)/images:/app/images \
-           bottle-cap-detection:latest \
-           predict --model weights/best.pt --source /app/images/test.jpg
-```
-
-## 🧪 Testing
-
+### Running Tests
 ```bash
 # Run all tests
 pytest tests/ -v
 
-# Run with coverage
+# With coverage
 pytest tests/ --cov=bsort --cov-report=html
-
-# Run specific test
-pytest tests/test_inference.py -k test_inference_pytorch
 ```
 
-## 🔄 CI/CD Pipeline
+### Code Quality
+```bash
+# Format code
+black bsort/ tests/
 
-The project includes automated CI/CD using GitHub Actions:
+# Sort imports
+isort bsort/ tests/
 
-✅ **Code Quality Checks**
-- Black formatting
-- isort import sorting
-- Pylint linting (score >8.0)
-
-✅ **Testing**
-- Unit tests with pytest
-- Coverage reporting
-
-✅ **Docker Build**
-- Multi-stage build
-- Push to Docker Hub (on release)
-
-## 📈 Experiment Tracking
-
-Training experiments are tracked using [Weights & Biases](https://wandb.ai):
-
-```python
-# Already integrated in training script
-import wandb
-wandb.init(project="bottle-cap-detection")
+# Lint
+pylint bsort/
 ```
 
-**View public dashboard**: [https://wandb.ai/your-project/bottle-cap-detection](https://wandb.ai/your-project/bottle-cap-detection)
+## 🐳 Docker
 
-## 🎓 Model Development Process
+### Build
+```bash
+docker build -t bottle-cap-detection:latest .
+```
 
-1. **Dataset Preparation**: 148 images (132 train, 12 val, 4 test)
-2. **Augmentation**: Heavy augmentation for small dataset
-   - HSV color jitter
-   - Rotation, flip, shear, perspective
-   - Mosaic, mixup, copy-paste
-3. **Training**: Transfer learning from YOLOv8n COCO
-4. **Optimization**: Export to ONNX for edge deployment
-5. **Evaluation**: Per-class metrics and inference benchmarking
+### Run Training
+```bash
+docker run -v $(pwd)/data:/app/data \
+           -v $(pwd)/runs:/app/runs \
+           bottle-cap-detection:latest \
+           bsort train --config /app/configs/train_config.yaml
+```
+
+### Run Inference
+```bash
+docker run -v $(pwd)/images:/app/images \
+           bottle-cap-detection:latest \
+           bsort infer --image /app/images/test.jpg --model /app/best.pt
+```
+
+## 📊 Results
+
+### Dataset Statistics
+- **Total Images**: 148
+- **Train**: 132 images
+- **Validation**: 12 images
+- **Test**: 4 images
+
+### Training Results
+- **Best mAP@50**: 99.3%
+- **Training Time**: ~2-3 hours (CPU)
+- **Final Loss**: <1.0
+
+### Inference Benchmarks
+| Device | Model | Avg Time | FPS |
+|--------|-------|----------|-----|
+| CPU (Colab) | PyTorch | 74ms | 13.5 |
+| CPU (Colab) | ONNX | 8-15ms | 62-125 |
+| Raspberry Pi 5* | ONNX | <10ms* | >100* |
+
+*Projected performance
+
+## 🔗 Weights & Biases
+
+View training metrics and experiments:
+[https://wandb.ai/YOUR_USERNAME/bottle-cap-detection](https://wandb.ai/YOUR_USERNAME/bottle-cap-detection)
+
+## 📝 Citation
+
+```bibtex
+@software{bottle_cap_detection_2025,
+  title = {Bottle Cap Detection with YOLOv8},
+  author = {Your Name},
+  year = {2025},
+  url = {https://github.com/YOUR_USERNAME/bottle-cap-detection}
+}
+```
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
-
+Contributions are welcome! Please:
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics)
-- [Weights & Biases](https://wandb.ai/)
-- Dataset from bottle cap detection project
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
 
 ## 📧 Contact
 
-Your Name - [@yourhandle](https://twitter.com/yourhandle)
+For questions or issues, please open an issue on GitHub.
 
-Project Link: [https://github.com/yourusername/bottle-cap-detection](https://github.com/yourusername/bottle-cap-detection)
+---
+
+**Made with ❤️ for edge AI deployment**
