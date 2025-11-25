@@ -1,0 +1,94 @@
+# ====================================================================
+# Bottle Cap Detection Training Configuration
+# ====================================================================
+
+# Model Configuration
+model:
+  name: yolov8n.pt  # Pre-trained YOLOv8 Nano model
+  input_size: 320   # Input image size (320x320 for speed)
+
+# Dataset Configuration
+dataset:
+  data_yaml: data/data.yaml  # Path to data.yaml
+  train_split: train
+  val_split: val
+  test_split: test
+
+# Training Parameters
+training:
+  epochs: 250
+  batch_size: 16
+  patience: 50        # Early stopping patience
+  save_period: 50     # Save checkpoint every N epochs
+  device: cuda        # cuda or cpu (auto-detected if not specified)
+  workers: 8          # Number of dataloader workers
+  
+# Optimization
+optimization:
+  optimizer: Adam
+  lr0: 0.0001         # Initial learning rate (reduced for fine-tuning)
+  lrf: 0.01           # Final learning rate factor
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 3.0
+  warmup_momentum: 0.8
+  warmup_bias_lr: 0.1
+
+# Data Augmentation
+augmentation:
+  # HSV Color Jitter
+  hsv_h: 0.015        # Hue augmentation
+  hsv_s: 0.7          # Saturation augmentation
+  hsv_v: 0.4          # Value augmentation
+  
+  # Geometric Transforms
+  degrees: 15.0       # Rotation degrees
+  translate: 0.15     # Translation
+  scale: 0.7          # Scale variation
+  shear: 5.0          # Shear degrees
+  perspective: 0.0005 # Perspective transform
+  
+  # Flip
+  flipud: 0.1         # Vertical flip probability
+  fliplr: 0.5         # Horizontal flip probability
+  
+  # Advanced Augmentation
+  mosaic: 0.5         # Mosaic augmentation probability
+  mixup: 0.1          # Mixup augmentation probability
+  copy_paste: 0.1     # Copy-paste augmentation probability
+
+# Output Configuration
+output:
+  project: runs/train_bottle_cap
+  name: null          # Auto-generated if null
+  save_dir: null      # Auto-generated if null
+  plots: true         # Generate training plots
+  verbose: false      # Verbose output
+
+# Weights & Biases Configuration
+wandb:
+  enabled: true
+  project: bottle-cap-detection
+  entity: null        # Your W&B username/team
+  name: null          # Auto-generated if null
+  tags:
+    - yolov8n
+    - bottle-cap
+    - edge-device
+
+# Inference Configuration (for validation)
+inference:
+  conf_threshold: 0.5  # Confidence threshold
+  iou_threshold: 0.45  # NMS IoU threshold
+  max_det: 300         # Maximum detections per image
+
+# Export Configuration
+export:
+  formats:
+    - onnx
+    - torchscript
+  onnx:
+    opset: 11
+    simplify: true
+  tensorrt:
+    half: true         # FP16 precision

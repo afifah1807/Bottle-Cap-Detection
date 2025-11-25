@@ -1,0 +1,16 @@
+# Inference Configuration for Bottle Cap Detection
+
+model:
+  path: models/best.pt  # Sesuaikan dengan path model Anda
+  input_size: 320
+
+inference:
+  conf_threshold: 0.25
+  iou_threshold: 0.45
+  max_det: 100
+  device: cuda  # Ubah ke 'cpu' jika tidak ada GPU
+
+visualization:
+  line_thickness: 2
+  save_output: true
+  output_dir: outputs/
