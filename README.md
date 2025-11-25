@@ -224,5 +224,6 @@ docker run -v $(pwd)/images:/app/images \
 ## 🔗 Weights & Biases
 
 View training metrics and experiments:
-[https://wandb.ai/YOUR_USERNAME/bottle-cap-detection](https://wandb.ai/YOUR_USERNAME/bottle-cap-detection)
+[https://wandb.ai/afifahapriliani2000-mecata-foundation/bottle-cap-detection/)
+
 
